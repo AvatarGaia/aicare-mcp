@@ -1,0 +1,12 @@
+# secrets / env
+.env
+*.key
+*.pem
+github-token.txt
+
+# logs / temp
+*.log
+tmp/
+.DS_Store
+node_modules/
+__pycache__/

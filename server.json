@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "top.avatargaia/aicare-mcp",
+  "description": "AIcare 康护评估 MCP：检测图/问卷 → 健康评估 → 康护分析报告 → 康复指导书（健康评估与康护建议，非医学诊断）",
+  "version": "0.1.0",
+  "websiteUrl": "https://agent.avatargaia.top",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://agent.avatargaia.top/api/mcp/aicare",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer <API_KEY>（联系 octopus@arplus.top 开通）",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/avatargaia/aicare-mcp",
+    "source": "github"
+  }
+}
