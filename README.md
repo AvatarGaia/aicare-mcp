@@ -1,11 +1,11 @@
 # AIcare MCP
-[![aicare-mcp MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/group.aicare/aicare-mcp/badges/score.svg)](https://glama.ai/mcp/connectors/group.aicare/aicare-mcp)
 
 > **AI 康护评估 MCP Server** — 让任何 AI Agent 用一句话完成「看检测图 → 出康护评估 → 生成康复方案」。
 > 由 [虚实科技](https://agent.avatargaia.top) 研发，面向康护机构、康复师、家庭照护场景。
 
 [![MCP](https://img.shields.io/badge/MCP-streamable--http-blue)]()
 [![License](https://img.shields.io/badge/license-see%20LICENSE-lightgrey)]()
+[![aicare-mcp MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/group.aicare/aicare-mcp/badges/score.svg)](https://glama.ai/mcp/connectors/group.aicare/aicare-mcp)
 
 ---
 
