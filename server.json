@@ -1,32 +1,16 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
-  "name": "group.aicare/aicare-mcp",
-  "description": "AIcare 康护评估 MCP：舌诊等 AI 检测 → 健康评估 → 康护报告 → 康复指导书（健康评估与康护建议，非医学诊断）",
-  "version": "0.1.0",
-  "websiteUrl": "https://www.aicare.group",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.AvatarGaia/aicare-mcp",
+  "description": "AIcare 康护评估 MCP：7 个工具、22 类检测（13 类 live）。输出健康评估与康护建议，非医学诊断。",
+  "version": "0.2.0",
+  "websiteUrl": "https://agent.avatargaia.top",
   "remotes": [
-    {
-      "type": "streamable-http",
-      "url": "https://www.aicare.group/api/mcp/aicare",
-      "headers": [
-        {
-          "name": "Authorization",
-          "description": "Bearer <API_KEY>（联系 octopus@arplus.top 开通）",
-          "isRequired": true,
-          "isSecret": true
-        }
-      ]
-    },
     {
       "type": "streamable-http",
       "url": "https://agent.avatargaia.top/api/mcp/aicare",
       "headers": [
-        {
-          "name": "Authorization",
-          "description": "Bearer <API_KEY>（镜像端点）",
-          "isRequired": true,
-          "isSecret": true
-        }
+        { "name": "Authorization", "description": "Bearer <API_KEY>", "isRequired": true, "isSecret": true },
+        { "name": "X-API-KEY", "description": "API Key（替代 Authorization，供 Smithery 等客户端）", "isRequired": false, "isSecret": true }
       ]
     }
   ],
