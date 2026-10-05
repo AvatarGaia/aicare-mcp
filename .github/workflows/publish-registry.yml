@@ -1,0 +1,33 @@
+name: Publish to MCP Registry
+
+# Publish server.json to the official MCP Registry (registry.modelcontextprotocol.io)
+# Auth via GitHub Actions OIDC (github-oidc) — no long-lived token needed.
+# Namespace io.github.AvatarGaia/aicare-mcp is verified by this repository's identity.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mcp-publisher
+        run: |
+          curl -sL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          ./mcp-publisher --help | head -5
+
+      - name: Validate server.json
+        run: ./mcp-publisher validate
+
+      - name: Login (GitHub OIDC)
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish
+        run: ./mcp-publisher publish
