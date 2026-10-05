@@ -1,0 +1,37 @@
+{
+  "name": "@avatargaia/aicare-mcp",
+  "version": "0.1.0",
+  "mcpName": "group.aicare/aicare-mcp",
+  "description": "stdio 马甲：把仅支持 stdio 的 MCP 客户端接到 AIcare 康护评估 MCP（streamable-http，7 工具 / 22 类检测）",
+  "bin": {
+    "aicare-mcp": "bin/aicare-mcp.js"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "aicare",
+    "health",
+    "tongue-diagnosis",
+    "stdio-shim",
+    "gaia"
+  ],
+  "author": "八爪 (Octopus) <octopus@arplus.top>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvatarGaia/aicare-mcp.git"
+  },
+  "homepage": "https://agent.avatargaia.top/mcp/aicare.html",
+  "bugs": {
+    "url": "https://github.com/AvatarGaia/aicare-mcp/issues"
+  }
+}
