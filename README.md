@@ -11,16 +11,21 @@
 
 ## 这是什么
 
-AIcare MCP 把「AIcare 智护工作台」的核心能力开放为标准 MCP 工具，任何支持 MCP 的客户端
-（Claude、ChatGPT、Cursor、OpenClaw/Gaia Agent 等）都可以直接调用：
+AIcare MCP 把「AIcare 智护工作台」的 AI 健康检测能力开放为标准 MCP 工具，任何支持 MCP 的客户端
+（Claude、ChatGPT、Cursor、Cline、OpenClaw/Gaia Agent 等）都可以直接调用。
 
-| 工具 | 作用 | 说明 |
+| 工具 | 作用 | 计费 |
 |---|---|---|
-| `assess_health_image` | 上传检测照片 → 结构化量表评估 | 舌象 / 面色 / 步态 / 指甲 / 掌纹 / 脑龄 / 骨密度 / 卒中风险 … |
-| `run_health_survey` | 提交问卷/量表 → 评估结果 | 睡眠 / 呼吸 / 用药安全 / 居家照护 / 跌倒 / Braden 等 |
-| `generate_care_plan` | 患者档案 + 评估结果 → **康护分析报告** | 含整体评估、风险分级、重点关注项 |
-| `generate_rehab_guide` | 生成**康复指导书 / 阶段目标 / 周计划** | 长任务，异步返回 |
-| `get_patient_context` | 查询关爱对象档案 | 家属 / 康护师场景 |
+| `aicare_list_kinds` | 列出支持的检测类型、哪些已开放、拍照/问卷要求。**先调它** | 免费 |
+| `aicare_detect` | 提交照片 / 问卷 / 视频做一次 AI 健康检测，返回结构化报告 | 按次 |
+| `aicare_get_job` | `aicare_detect` 返回 `status=running` 时，用 `job_id` 取最终结果 | 免费 |
+| `aicare_get_detection` | 凭 `healthCheckId` 取回一次检测报告 | 免费 |
+| `aicare_detect_history` | 查某用户某类检测的历史报告，用于前后对比 | 免费 |
+| `aicare_tongue_diagnose` | 舌象分析（等价于 `aicare_detect(kind="tongue")`） | 按次 |
+| `aicare_tongue_history` | 舌诊历史（等价于 `aicare_detect_history(kind="tongue")`） | 免费 |
+
+检测类型覆盖舌象、面部、指甲、口腔、骨密度、中风风险、睡眠、居家照护、用药安全、步态等，**实际开放哪些以 `aicare_list_kinds` 返回的 `status=live` 为准**。
+每次检测除结构化数据外，还返回 `reportUrl`（给人看的报告页）和 `embedUrl`（可 iframe 嵌入）。
 
 > ⚕️ **合规声明**：本服务提供**健康评估与康护建议**，不构成医学诊断或治疗方案。
 > 所有输出需由专业人员复核。
@@ -30,8 +35,19 @@ AIcare MCP 把「AIcare 智护工作台」的核心能力开放为标准 MCP 工
 ```
 POST https://agent.avatargaia.top/api/mcp/aicare
 Transport: streamable-http
-Auth: Authorization: Bearer <API_KEY>
+Auth: Authorization: Bearer <API_KEY>   （或请求头 X-API-KEY: <API_KEY>）
 ```
+
+## 获取 API Key（自助，30 秒）
+
+```bash
+curl -X POST https://agent.avatargaia.top/api/dev/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"my-agent","email":"you@example.com"}'
+# → 返回 dk_ 开头的 Key（只显示一次）+ 免费体验额度
+```
+
+机构批量接入、私有化部署，联系 `octopus@arplus.top`。
 
 ## 快速开始
 
@@ -49,44 +65,54 @@ Auth: Authorization: Bearer <API_KEY>
 }
 ```
 
-### 2) curl（直接调工具）
+### 2) 只支持 stdio 的客户端
+
+用已发布的 stdio 马甲 [`@avatargaia/canvas-mcp`](https://www.npmjs.com/package/@avatargaia/canvas-mcp)，把地址指到 AICare 端点：
+
+```bash
+CANVAS_MCP_URL=https://agent.avatargaia.top/api/mcp/aicare \
+CANVAS_MCP_TOKEN=dk_xxxxxxxx \
+npx -y @avatargaia/canvas-mcp
+```
+
+### 3) curl（直接调工具）
 
 ```bash
 curl -X POST https://agent.avatargaia.top/api/mcp/aicare \
   -H "Authorization: Bearer $AICARE_API_KEY" \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -d '{
     "jsonrpc": "2.0", "id": 1, "method": "tools/call",
     "params": {
-      "name": "assess_health_image",
-      "arguments": { "type": "tongue", "image_url": "https://example.com/tongue.jpg" }
+      "name": "aicare_detect",
+      "arguments": { "kind": "tongue", "imageUrl": "https://example.com/tongue.jpg" }
     }
   }'
 ```
 
-### 3) Python
+### 4) Python
 
 ```python
 import requests, os
 r = requests.post(
     "https://agent.avatargaia.top/api/mcp/aicare",
-    headers={"Authorization": f"Bearer {os.environ['AICARE_API_KEY']}"},
+    headers={
+        "Authorization": f"Bearer {os.environ['AICARE_API_KEY']}",
+        "Accept": "application/json, text/event-stream",
+    },
     json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
 )
-print(r.json())
+print(r.text)
 ```
-
-## 获取 API Key
-
-联系 `octopus@arplus.top` 开通（提供机构名称与使用场景）。
 
 ## 典型用法
 
 ```
-用户：帮我看看这张舌象照片，然后给我妈出一份康护方案
-Agent：① assess_health_image(type="tongue", image_url=...) → 量表评估
-       ② generate_care_plan(target_id=..., assessments=[...]) → 康护报告
-       ③ generate_rehab_guide(plan_id=...) → 康复指导书（长任务）
+用户：帮我看看这张舌象照片
+Agent：① aicare_list_kinds → 确认 tongue 已开放、拍照要求
+       ② aicare_detect(kind="tongue", imageUrl=...) → 若返回 job_id
+       ③ aicare_get_job(job_id) → 结构化报告 + reportUrl（发给用户打开看）
 ```
 
 ## 相关仓库 / 链接
